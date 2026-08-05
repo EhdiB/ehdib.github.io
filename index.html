@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover">
+<meta name="theme-color" content="#14133A">
+<title>Décrypto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:ital,wght@0,400;0,500;0,700;1,500&family=Martian+Mono:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --encre:#14133A;
+    --panneau:#1E1D4E;
+    --trait:#35347A;
+    --clair:#EDEBFA;
+    --lavande:#9B8CFF;
+    --signal:#FFD24A;
+    --sourdine:#8B89C4;
+    --r:14px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0;height:100%}
+  body{
+    background:
+      radial-gradient(120% 60% at 50% -10%, color-mix(in srgb, var(--lavande) 22%, var(--encre)) 0%, rgba(0,0,0,0) 60%),
+      var(--encre);
+    color:var(--clair);
+    font-family:"Familjen Grotesk",system-ui,-apple-system,sans-serif;
+    height:100dvh;
+    overflow:hidden;
+    padding:max(14px,env(safe-area-inset-top)) 16px calc(14px + env(safe-area-inset-bottom));
+    display:flex;justify-content:center;
+    transition:background .35s ease,color .35s ease;
+  }
+  .app{width:100%;max-width:520px;height:100%;display:flex;flex-direction:column;gap:12px}
+
+  /* ---- en-tête ---- */
+  header{display:flex;flex-direction:column;gap:10px;flex:0 0 auto}
+  .ligne-titre{display:flex;flex-direction:column}
+  .ligne-actions{display:flex;justify-content:flex-end;align-items:center;gap:8px}
+  .marque{font-size:clamp(24px,9vw,38px);font-weight:700;letter-spacing:.1em;line-height:.95;margin:0}
+  .marque span{color:var(--lavande);transition:color .35s ease}
+  .eyebrow{
+    font-family:"Martian Mono",monospace;font-size:9px;font-weight:600;
+    letter-spacing:.26em;color:var(--sourdine);text-transform:uppercase;margin:0 0 6px
+  }
+  .btn-nouvelle{
+    font-family:"Martian Mono",monospace;font-size:9.5px;font-weight:600;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--encre);background:var(--signal);
+    border:0;border-radius:999px;padding:10px 16px;cursor:pointer;white-space:nowrap;
+    flex:0 0 auto;transition:background .35s ease
+  }
+  .btn-nouvelle:active{transform:translateY(1px)}
+  .btn-icone{
+    flex:0 0 auto;width:38px;height:38px;display:grid;place-items:center;
+    background:transparent;border:1px solid var(--trait);border-radius:999px;
+    color:var(--clair);cursor:pointer;padding:0
+  }
+  .btn-icone:active{transform:translateY(1px)}
+  .btn-icone svg{width:17px;height:17px}
+  .btn-icone .icone-sortir{display:none}
+  body.plein .btn-icone .icone-entrer{display:none}
+  body.plein .btn-icone .icone-sortir{display:block}
+
+  /* ---- grille des mots ---- */
+  .grille{display:flex;flex-direction:column;gap:8px;flex:1 1 auto;min-height:0}
+  .mot{
+    position:relative;display:flex;align-items:stretch;gap:0;flex:1 1 0;
+    background:var(--panneau);border:1px solid var(--trait);border-radius:var(--r);
+    overflow:hidden;cursor:pointer;width:100%;padding:0;text-align:left;
+    font:inherit;color:inherit;min-height:0;
+    transition:background .35s ease,border-color .35s ease;
+  }
+  .mot:focus-visible{outline:2px solid var(--signal);outline-offset:2px}
+  .num{
+    flex:0 0 48px;display:grid;place-items:center;
+    font-family:"Martian Mono",monospace;font-size:19px;font-weight:800;
+    color:var(--lavande);border-right:1px solid var(--trait);
+    background:rgba(0,0,0,.16);transition:color .35s ease,border-color .35s ease;
+  }
+  .zone{position:relative;flex:1;display:grid;place-items:center start;padding:0 16px}
+  .texte{
+    font-size:clamp(17px,5.4vw,24px);font-weight:700;letter-spacing:-.01em;
+    text-transform:capitalize;
+    opacity:0;transform:translateY(4px);transition:opacity .22s ease,transform .22s ease
+  }
+  .mot.vu .texte{opacity:1;transform:none}
+  .cache{
+    position:absolute;inset:0;display:flex;align-items:center;padding:0 16px;
+    background:
+      repeating-linear-gradient(-45deg,
+        color-mix(in srgb, var(--panneau) 88%, white 6%) 0 9px,
+        color-mix(in srgb, var(--panneau) 88%, black 10%) 9px 18px);
+    transition:transform .3s cubic-bezier(.4,0,.2,1);
+  }
+  .mot.vu .cache{transform:translateX(101%)}
+  .cache em{
+    font-family:"Martian Mono",monospace;font-style:normal;font-size:10px;
+    letter-spacing:.24em;text-transform:uppercase;color:var(--sourdine)
+  }
+
+  /* ---- code ---- */
+  .code{
+    background:var(--panneau);border:1px solid var(--trait);border-radius:var(--r);
+    padding:12px;display:flex;flex-direction:column;gap:10px;flex:0 0 auto;
+    transition:background .35s ease,border-color .35s ease;
+  }
+  .code h2{
+    font-family:"Martian Mono",monospace;font-size:9px;font-weight:600;letter-spacing:.26em;
+    text-transform:uppercase;color:var(--sourdine);margin:0
+  }
+  .lattes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .latte{
+    background:var(--encre);border:1px solid var(--trait);border-radius:10px;
+    display:grid;place-items:center;padding:10px 0;
+    font-family:"Martian Mono",monospace;font-size:clamp(26px,9vw,38px);font-weight:800;
+    color:var(--signal);line-height:1;transition:border-color .35s ease,color .35s ease;
+  }
+  .code.masque .latte{color:var(--sourdine)}
+  .actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .btn{
+    font-family:"Martian Mono",monospace;font-size:9.5px;font-weight:600;letter-spacing:.1em;
+    text-transform:uppercase;padding:11px 8px;border-radius:10px;cursor:pointer;
+    background:transparent;color:var(--clair);border:1px solid var(--trait)
+  }
+  .btn.plein{background:var(--lavande);border-color:var(--lavande);color:var(--encre);transition:background .35s ease,border-color .35s ease}
+  .btn:active{transform:translateY(1px)}
+  .btn:focus-visible{outline:2px solid var(--signal);outline-offset:2px}
+
+  .pied{
+    font-family:"Martian Mono",monospace;font-size:8.5px;letter-spacing:.12em;
+    color:var(--sourdine);text-align:center;text-transform:uppercase;line-height:1.4;
+    margin:0;flex:0 0 auto
+  }
+
+  /* ---- boîte de dialogue ---- */
+  dialog{
+    border:1px solid var(--trait);border-radius:var(--r);background:var(--panneau);
+    color:var(--clair);padding:22px;width:min(360px,calc(100vw - 44px));
+    font-family:inherit;max-height:min(560px,calc(100dvh - 60px));overflow:auto
+  }
+  dialog::backdrop{background:rgba(10,9,32,.75)}
+  dialog h3{margin:0 0 8px;font-size:22px;font-weight:700}
+  dialog p{margin:0 0 18px;color:var(--sourdine);font-size:15px;line-height:1.5}
+  dialog .actions{grid-template-columns:1fr 1fr}
+
+  /* ---- réglages ---- */
+  .reglage-groupe{margin-bottom:20px}
+  .reglage-titre{
+    font-family:"Martian Mono",monospace;font-size:9px;font-weight:600;letter-spacing:.24em;
+    text-transform:uppercase;color:var(--sourdine);margin:0 0 10px
+  }
+  .langues{display:flex;background:var(--encre);border:1px solid var(--trait);border-radius:999px;padding:3px}
+  .langue-opt{
+    flex:1;text-align:center;padding:9px 0;border-radius:999px;border:0;background:transparent;
+    color:var(--sourdine);font-family:"Martian Mono",monospace;font-size:11px;font-weight:600;
+    letter-spacing:.08em;cursor:pointer
+  }
+  .langue-opt.actif{background:var(--lavande);color:var(--encre)}
+  .themes{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .theme-opt{
+    display:flex;flex-direction:column;align-items:center;gap:6px;background:transparent;
+    border:2px solid transparent;border-radius:12px;padding:8px 4px;cursor:pointer
+  }
+  .theme-opt.actif{border-color:var(--clair)}
+  .theme-puce{width:34px;height:34px;border-radius:50%;border:1px solid rgba(127,127,127,.3)}
+  .theme-nom{font-family:"Martian Mono",monospace;font-size:8.5px;letter-spacing:.06em;color:var(--sourdine);text-transform:uppercase;text-align:center}
+  .dlg-fermer{
+    width:100%;margin-top:4px;font-family:"Martian Mono",monospace;font-size:10px;font-weight:600;
+    letter-spacing:.1em;text-transform:uppercase;padding:12px;border-radius:10px;cursor:pointer;
+    background:var(--lavande);color:var(--encre);border:0
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    *{transition:none!important;animation:none!important}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <div class="ligne-titre">
+      <p class="eyebrow" id="txtEyebrow">Grille de l'équipe</p>
+      <h1 class="marque" id="txtMarque">DÉCRYP<span>TO</span></h1>
+    </div>
+    <div class="ligne-actions">
+      <button class="btn-icone" id="btnReglages" aria-label="Réglages">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+      <button class="btn-icone" id="btnPleinEcran" aria-label="Plein écran" aria-pressed="false">
+        <svg class="icone-entrer" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/></svg>
+        <svg class="icone-sortir" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v3a2 2 0 0 1-2 2H4M21 8h-3a2 2 0 0 1-2-2V3M15 21v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></svg>
+      </button>
+      <button class="btn-nouvelle" id="btnNouvelle">Nouvelle partie</button>
+    </div>
+  </header>
+
+  <div class="grille" id="grille"></div>
+
+  <section class="code masque" id="code">
+    <h2 id="txtCodeTitre">Code de transmission</h2>
+    <div class="lattes">
+      <div class="latte" id="c0">•</div>
+      <div class="latte" id="c1">•</div>
+      <div class="latte" id="c2">•</div>
+    </div>
+    <div class="actions">
+      <button class="btn plein" id="btnVoirCode">Afficher le code</button>
+      <button class="btn" id="btnNouveauCode">Nouveau code</button>
+    </div>
+  </section>
+
+  <p class="pied" id="txtPied">Touchez un mot pour l'afficher ou le masquer</p>
+</div>
+
+<dialog id="dlgPartie">
+  <h3 id="txtDlgPartieTitre">Nouvelle partie ?</h3>
+  <p id="txtDlgPartieCorps">Les quatre mots actuels seront remplacés.</p>
+  <div class="actions">
+    <button class="btn" id="partieNon">Annuler</button>
+    <button class="btn plein" id="partieOui">Commencer</button>
+  </div>
+</dialog>
+
+<dialog id="dlgEcran">
+  <h3 id="txtDlgEcranTitre">Garder l'écran allumé ?</h3>
+  <p id="txtDlgEcranCorps">L'écran restera actif pendant la partie.</p>
+  <div class="actions">
+    <button class="btn" id="ecranNon">Non</button>
+    <button class="btn plein" id="ecranOui">Oui (conseillé)</button>
+  </div>
+</dialog>
+
+<dialog id="dlgReglages">
+  <h3 id="txtReglagesTitre">Réglages</h3>
+  <div class="reglage-groupe">
+    <p class="reglage-titre" id="txtLangueTitre">Langue</p>
+    <div class="langues">
+      <button class="langue-opt" id="langueFR" data-lang="fr">Français</button>
+      <button class="langue-opt" id="langueEN" data-lang="en">English</button>
+    </div>
+  </div>
+  <div class="reglage-groupe">
+    <p class="reglage-titre" id="txtThemeTitre">Couleur d'équipe</p>
+    <div class="themes" id="themes"></div>
+  </div>
+  <button class="dlg-fermer" id="btnFermerReglages">Fermer</button>
+</dialog>
+
+<script>
+/* ============ contenu bilingue ============ */
+const I18N = {
+  fr:{
+    docTitle:'Décrypto', htmlLang:'fr', eyebrow:"Grille de l'équipe",
+    brandPrefix:'DÉCRYP', brandSuffix:'TO',
+    newGame:'Nouvelle partie', settings:'Réglages',
+    fullscreenEnter:'Plein écran', fullscreenExit:'Quitter le plein écran',
+    codeTitle:'Code de transmission', showCode:'Afficher le code', hideCode:'Masquer le code',
+    newCode:'Nouveau code', footerHint:"Touchez un mot pour l'afficher ou le masquer",
+    tileHint:'Touchez pour afficher',
+    newGameTitle:'Nouvelle partie ?', newGameBody:'Les quatre mots actuels seront remplacés.',
+    cancel:'Annuler', start:'Commencer',
+    screenTitle:"Garder l'écran allumé ?", screenBody:"L'écran restera actif pendant la partie.",
+    no:'Non', yes:'Oui (conseillé)',
+    settingsTitle:'Réglages', langLabel:'Langue', themeLabel:"Couleur d'équipe", close:'Fermer'
+  },
+  en:{
+    docTitle:'Decrypto', htmlLang:'en', eyebrow:"Team's grid",
+    brandPrefix:'DECRYP', brandSuffix:'TO',
+    newGame:'New game', settings:'Settings',
+    fullscreenEnter:'Fullscreen', fullscreenExit:'Exit fullscreen',
+    codeTitle:'Transmission code', showCode:'Show code', hideCode:'Hide code',
+    newCode:'New code', footerHint:'Tap a word to reveal or hide it',
+    tileHint:'Tap to reveal',
+    newGameTitle:'New game?', newGameBody:'The current four words will be replaced.',
+    cancel:'Cancel', start:'Start',
+    screenTitle:'Keep screen on?', screenBody:'The screen will stay awake during the game.',
+    no:'No', yes:'Yes (recommended)',
+    settingsTitle:'Settings', langLabel:'Language', themeLabel:'Team colour', close:'Close'
+  }
+};
+
+/* Words chosen for having several possible meanings/associations,
+   which is what makes clue-giving in Decrypto interesting. */
+const WORDS = {
+  fr:["avocat","banque","bureau","but","cadre","carte","chaîne","champ","chat","clé","col","cour","coupe","cours","coussin","feuille","glace","grève","lettre","livre","manche","mine","moule","mouton","note","page","pièce","pile","plume","pomme","porte","poste","pouce","quart","réseau","robe","rose","sac","souris","temps","tour","verre","vis","voile","volant","cible","cheville","écran","patte","langue","pointe","souche","tuile","vol","arc","bar","base","batterie","boîte","bouche","canon","capital","casque","cave","chambre","char","comprimé","corps","coupure","disque","échelle","éclat","épine","étoile","façade","faute","fond","forme","front","gomme","grade","groupe","herbe","image","jeu","marche","marque","masse","mode","mur","ordre","organe","orgue","paire","panier","papier","parfum","patin","peau","phare","pied","plaque","plan","plat","poids","point","pont","pouls","presse","prise","puce","queue","rail","rayon","régime","rein","requin","ressort","robinet","ruche","ruse","sabot","salle","sang","sein","siège","signe","socle","soldat","soleil","sommet","source","station","style","sujet","table","tache","talon","tapis","teint","terrain","tête","timbre","tissu","ton","torche","trace","train","trait","tronc","trou","truc","tube","type","usine","vague","valeur","ventre","veste","vitre","voix","zone"],
+  en:["bank","spring","bat","bar","bolt","bow","crane","date","fan","jam","key","note","palm","park","pen","pitcher","plant","pool","pound","punch","ring","rock","rose","scale","seal","square","staple","star","stick","story","tank","tie","watch","well","wave","iron","organ","current","match","chest","arm","present","novel","fair","board","bass","chip","club","court","den","drill","fine","fly","gum","hide","kid","light","lock","mint","nail","pit","pupil","ram","saw","sole","spirit","tap","tire","trunk","yard","cell","cast","charge","capital","degree","figure","ground","interest","issue","race","ruler","sentence","spell","table","tender","trip","type","volume","band","bark","batter","beam","bill","block","bluff","brace","brief","buckle","bulb","bunk","cabinet","camp","cap","case","chain","channel","charm","clip","cloud","coach","coast","cone","content","cord","counter","cover","crack","cricket","crop","crown","cue","cup","dash","deck","desert","draft","drop","drum","duck","era","feature","field","film","flag","flat","flock","form","frame","gap","gauge","glass","grain","grip","hail","hamper","hoard","host","jar","jelly","jet","joint","junk","kernel","latch","leaf","ledge","limb","line","litter","lodge","loft","log","mane","mask","mast","mine","mold","net","nut","pane","pass","patch","pier","pipe","pitch","plot","plug","pod","point","pole","port","post","pot","pump","quill","rack","raft","rail","rank","ray","reed","reel","rib","ridge","rig","rind","rink","rod","roll","root","row","sack","saddle","sail","sap","scoop","screen","seat","sheet","shell","shore","shot","shoulder","sink","skin","sleeve","slip","slug","snap","sock","spike","spine","spool","spoon","spot","spray","spur","stall","stalk","stamp","stand","stem","stitch","stock","stool","storm","strand","straw","stream","strip","stroke","stump","suit","swing","switch","tab","tack","tag","tail","target","throat","thumb","tide","tissue","toll","tomb","torch","track","trap","tray","tread","trough","tube","tuck","tug","tusk","twig","valve","vault","vent","vine","wagon","waist","wallet","wand","wax","web","wick","wing","wire","wreck","wrist","yolk","zone"]
+};
+
+/* ============ thèmes ============ */
+const THEMES = [
+  {id:'violet', fr:'Violet', en:'Violet', encre:'#14133A', panneau:'#1E1D4E', trait:'#35347A', lavande:'#9B8CFF', signal:'#FFD24A', sourdine:'#8B89C4', clair:'#EDEBFA'},
+  {id:'corail', fr:'Corail', en:'Coral', encre:'#1F1512', panneau:'#2B1D18', trait:'#4A342B', lavande:'#FF8C6B', signal:'#FFD24A', sourdine:'#B78E80', clair:'#F5EDE9'},
+  {id:'emeraude', fr:'Émeraude', en:'Emerald', encre:'#0E1F1A', panneau:'#152D25', trait:'#26493C', lavande:'#4CD9A0', signal:'#FFD24A', sourdine:'#7FB3A0', clair:'#E8F5EF'},
+  {id:'azur', fr:'Azur', en:'Azure', encre:'#0E1826', panneau:'#152A40', trait:'#264868', lavande:'#5EB3FF', signal:'#FFD24A', sourdine:'#7FA3C4', clair:'#EAF3FF'},
+  {id:'magenta', fr:'Magenta', en:'Magenta', encre:'#210D1B', panneau:'#331327', trait:'#552041', lavande:'#FF6FC0', signal:'#FFD24A', sourdine:'#C284AC', clair:'#FBEAF4'},
+  {id:'ambre', fr:'Ambre', en:'Amber', encre:'#211505', panneau:'#332008', trait:'#573510', lavande:'#FFB454', signal:'#5EEAD4', sourdine:'#C4A47E', clair:'#FBF1E3'},
+  {id:'clair', fr:'Clair', en:'Light', encre:'#F7F7FB', panneau:'#FFFFFF', trait:'#E3E1F0', lavande:'#5B4FE9', signal:'#FF5A36', sourdine:'#6F6D91', clair:'#1B1A33'}
+];
+
+/* ============ état ============ */
+let etat = {lang:'fr', theme:'violet'};
+try{
+  const sauvegarde = JSON.parse(localStorage.getItem('decrypto-config') || 'null');
+  if(sauvegarde && sauvegarde.lang && sauvegarde.theme) etat = sauvegarde;
+}catch(e){ /* stockage indisponible, on reste sur les valeurs par défaut */ }
+
+function sauvegarder(){
+  try{ localStorage.setItem('decrypto-config', JSON.stringify(etat)); }catch(e){}
+}
+
+/* ============ éléments ============ */
+const grille = document.getElementById('grille');
+const panneauCode = document.getElementById('code');
+const lattes = [0,1,2].map(i => document.getElementById('c'+i));
+const btnVoirCode = document.getElementById('btnVoirCode');
+let codeActuel = [], codeVisible = false, veille = null;
+
+/* ============ langue ============ */
+function appliquerLangue(lang, redessiner){
+  etat.lang = lang;
+  const t = I18N[lang];
+  document.documentElement.lang = t.htmlLang;
+  document.title = t.docTitle;
+  document.getElementById('txtEyebrow').textContent = t.eyebrow;
+  document.getElementById('txtMarque').innerHTML = t.brandPrefix + '<span>' + t.brandSuffix + '</span>';
+  document.getElementById('btnNouvelle').textContent = t.newGame;
+  document.getElementById('btnReglages').setAttribute('aria-label', t.settings);
+  document.getElementById('btnPleinEcran').setAttribute('aria-label', estPlein() ? t.fullscreenExit : t.fullscreenEnter);
+  document.getElementById('txtCodeTitre').textContent = t.codeTitle;
+  btnVoirCode.textContent = codeVisible ? t.hideCode : t.showCode;
+  document.getElementById('btnNouveauCode').textContent = t.newCode;
+  document.getElementById('txtPied').textContent = t.footerHint;
+  document.querySelectorAll('.cache em').forEach(el => el.textContent = t.tileHint);
+  document.getElementById('txtDlgPartieTitre').textContent = t.newGameTitle;
+  document.getElementById('txtDlgPartieCorps').textContent = t.newGameBody;
+  document.getElementById('partieNon').textContent = t.cancel;
+  document.getElementById('partieOui').textContent = t.start;
+  document.getElementById('txtDlgEcranTitre').textContent = t.screenTitle;
+  document.getElementById('txtDlgEcranCorps').textContent = t.screenBody;
+  document.getElementById('ecranNon').textContent = t.no;
+  document.getElementById('ecranOui').textContent = t.yes;
+  document.getElementById('txtReglagesTitre').textContent = t.settingsTitle;
+  document.getElementById('txtLangueTitre').textContent = t.langLabel;
+  document.getElementById('txtThemeTitre').textContent = t.themeLabel;
+  document.getElementById('btnFermerReglages').textContent = t.close;
+  document.getElementById('langueFR').classList.toggle('actif', lang==='fr');
+  document.getElementById('langueEN').classList.toggle('actif', lang==='en');
+  document.querySelectorAll('.theme-nom').forEach(el=>{
+    const theme = THEMES.find(x=>x.id===el.dataset.theme);
+    if(theme) el.textContent = theme[lang];
+  });
+  sauvegarder();
+  if(redessiner){
+    dessinerGrille(tirerMots());
+    codeActuel = tirerCode();
+    afficherCode(false);
+  }
+}
+
+/* ============ thème couleur ============ */
+function appliquerTheme(id, sauvegarderEtat){
+  const theme = THEMES.find(x=>x.id===id) || THEMES[0];
+  etat.theme = theme.id;
+  const racine = document.documentElement.style;
+  racine.setProperty('--encre', theme.encre);
+  racine.setProperty('--panneau', theme.panneau);
+  racine.setProperty('--trait', theme.trait);
+  racine.setProperty('--lavande', theme.lavande);
+  racine.setProperty('--signal', theme.signal);
+  racine.setProperty('--sourdine', theme.sourdine);
+  racine.setProperty('--clair', theme.clair);
+  document.querySelector('meta[name="theme-color"]').setAttribute('content', theme.encre);
+  document.querySelectorAll('.theme-opt').forEach(el => el.classList.toggle('actif', el.dataset.theme===theme.id));
+  if(sauvegarderEtat) sauvegarder();
+}
+
+function construireThemes(){
+  const conteneur = document.getElementById('themes');
+  conteneur.innerHTML = '';
+  THEMES.forEach(theme=>{
+    const b = document.createElement('button');
+    b.className = 'theme-opt';
+    b.type = 'button';
+    b.dataset.theme = theme.id;
+    b.innerHTML = '<span class="theme-puce" style="background:'+theme.lavande+'"></span><span class="theme-nom" data-theme="'+theme.id+'">'+theme[etat.lang]+'</span>';
+    b.addEventListener('click', ()=> appliquerTheme(theme.id, true));
+    conteneur.appendChild(b);
+  });
+}
+
+/* ============ mots & grille ============ */
+function tirerMots(){
+  const pool = WORDS[etat.lang].slice();
+  const choix = [];
+  for(let i=0;i<4;i++){
+    choix.push(pool.splice(Math.floor(Math.random()*pool.length),1)[0]);
+  }
+  return choix;
+}
+
+function dessinerGrille(mots){
+  grille.innerHTML = '';
+  mots.forEach((mot,i)=>{
+    const b = document.createElement('button');
+    b.className = 'mot';
+    b.type = 'button';
+    b.setAttribute('aria-pressed','false');
+    b.innerHTML =
+      '<span class="num">'+(i+1)+'</span>'+
+      '<span class="zone"><span class="texte"></span>'+
+      '<span class="cache"><em>'+I18N[etat.lang].tileHint+'</em></span></span>';
+    b.querySelector('.texte').textContent = mot;
+    b.addEventListener('click',()=>{
+      const vu = b.classList.toggle('vu');
+      b.setAttribute('aria-pressed', vu ? 'true':'false');
+    });
+    grille.appendChild(b);
+  });
+}
+
+/* ============ code ============ */
+function tirerCode(){
+  const n = [1,2,3,4];
+  const c = [];
+  for(let i=0;i<3;i++) c.push(n.splice(Math.floor(Math.random()*n.length),1)[0]);
+  return c;
+}
+
+function afficherCode(visible){
+  codeVisible = visible;
+  panneauCode.classList.toggle('masque',!visible);
+  btnVoirCode.textContent = visible ? I18N[etat.lang].hideCode : I18N[etat.lang].showCode;
+  lattes.forEach((el,i)=> el.textContent = visible ? codeActuel[i] : '•');
+}
+
+function brouiller(){
+  const reduit = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(!codeVisible || reduit){ afficherCode(codeVisible); return; }
+  let tours = 0;
+  const id = setInterval(()=>{
+    lattes.forEach(el => el.textContent = 1 + Math.floor(Math.random()*4));
+    if(++tours > 7){ clearInterval(id); afficherCode(true); }
+  },45);
+}
+
+function nouveauCode(){
+  codeActuel = tirerCode();
+  brouiller();
+}
+
+btnVoirCode.addEventListener('click',()=>afficherCode(!codeVisible));
+document.getElementById('btnNouveauCode').addEventListener('click',nouveauCode);
+
+/* ============ dialogues jeu ============ */
+const dlgPartie = document.getElementById('dlgPartie');
+const dlgEcran  = document.getElementById('dlgEcran');
+const dlgReglages = document.getElementById('dlgReglages');
+
+document.getElementById('btnNouvelle').addEventListener('click',()=>dlgPartie.showModal());
+document.getElementById('partieNon').addEventListener('click',()=>dlgPartie.close());
+document.getElementById('partieOui').addEventListener('click',()=>{
+  dlgPartie.close();
+  dessinerGrille(tirerMots());
+  codeActuel = tirerCode();
+  afficherCode(false);
+  if(!veille && 'wakeLock' in navigator) dlgEcran.showModal();
+});
+
+document.getElementById('ecranNon').addEventListener('click',()=>dlgEcran.close());
+document.getElementById('ecranOui').addEventListener('click',async ()=>{
+  dlgEcran.close();
+  try{ veille = await navigator.wakeLock.request('screen'); }catch(e){ veille = null; }
+});
+document.addEventListener('visibilitychange',async()=>{
+  if(veille && document.visibilityState==='visible'){
+    try{ veille = await navigator.wakeLock.request('screen'); }catch(e){ veille = null; }
+  }
+});
+
+/* ============ réglages ============ */
+document.getElementById('btnReglages').addEventListener('click',()=>dlgReglages.showModal());
+document.getElementById('btnFermerReglages').addEventListener('click',()=>dlgReglages.close());
+document.getElementById('langueFR').addEventListener('click',()=>appliquerLangue('fr', true));
+document.getElementById('langueEN').addEventListener('click',()=>appliquerLangue('en', true));
+
+/* ============ plein écran ============ */
+const btnPleinEcran = document.getElementById('btnPleinEcran');
+function estPlein(){ return !!document.fullscreenElement; }
+function majBoutonPlein(){
+  const p = estPlein();
+  document.body.classList.toggle('plein', p);
+  btnPleinEcran.setAttribute('aria-pressed', p ? 'true' : 'false');
+  btnPleinEcran.setAttribute('aria-label', p ? I18N[etat.lang].fullscreenExit : I18N[etat.lang].fullscreenEnter);
+}
+btnPleinEcran.addEventListener('click', async ()=>{
+  try{
+    if(!estPlein()){ await document.documentElement.requestFullscreen(); }
+    else{ await document.exitFullscreen(); }
+  }catch(e){ /* API indisponible sur cet appareil */ }
+});
+document.addEventListener('fullscreenchange', majBoutonPlein);
+
+/* ============ démarrage ============ */
+construireThemes();
+appliquerTheme(etat.theme, false);
+appliquerLangue(etat.lang, false);
+dessinerGrille(tirerMots());
+codeActuel = tirerCode();
+afficherCode(false);
+</script>
+</body>
+</html>
