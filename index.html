@@ -1,32 +1,31 @@
-<!-- redeploy -->
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover">
 <meta name="theme-color" content="#14133A">
-<title>Décrypto</title>
+<title>Decrypto</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:ital,wght@0,400;0,500;0,700;1,500&family=Martian+Mono:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --encre:#14133A;
-    --panneau:#1E1D4E;
-    --trait:#35347A;
-    --clair:#EDEBFA;
-    --lavande:#9B8CFF;
-    --signal:#FFD24A;
-    --sourdine:#8B89C4;
-    --r:14px;
+    --ink:#14133A;
+    --panel:#1E1D4E;
+    --border:#35347A;
+    --text:#EDEBFA;
+    --accent:#9B8CFF;
+    --highlight:#FFD24A;
+    --muted:#8B89C4;
+    --radius:14px;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{margin:0;padding:0;height:100%}
   body{
     background:
-      radial-gradient(120% 60% at 50% -10%, color-mix(in srgb, var(--lavande) 22%, var(--encre)) 0%, rgba(0,0,0,0) 60%),
-      var(--encre);
-    color:var(--clair);
+      radial-gradient(120% 60% at 50% -10%, color-mix(in srgb, var(--accent) 22%, var(--ink)) 0%, rgba(0,0,0,0) 60%),
+      var(--ink);
+    color:var(--text);
     font-family:"Familjen Grotesk",system-ui,-apple-system,sans-serif;
     height:100dvh;
     overflow:hidden;
@@ -36,142 +35,160 @@
   }
   .app{width:100%;max-width:520px;height:100%;display:flex;flex-direction:column;gap:12px}
 
-  /* ---- en-tête ---- */
+  /* ---- header ---- */
   header{display:flex;flex-direction:column;gap:10px;flex:0 0 auto}
-  .ligne-titre{display:flex;flex-direction:column}
-  .ligne-actions{display:flex;justify-content:flex-end;align-items:center;gap:8px}
-  .marque{font-size:clamp(24px,9vw,38px);font-weight:700;letter-spacing:.1em;line-height:.95;margin:0}
-  .marque span{color:var(--lavande);transition:color .35s ease}
-  .eyebrow{
-    font-family:"Martian Mono",monospace;font-size:9px;font-weight:600;
-    letter-spacing:.26em;color:var(--sourdine);text-transform:uppercase;margin:0 0 6px
-  }
-  .btn-nouvelle{
+  .title-row{display:flex;flex-direction:column}
+  .actions-row{display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:center;gap:8px}
+  .brand{font-size:clamp(24px,9vw,38px);font-weight:700;letter-spacing:.1em;line-height:.95;margin:0}
+  .btn-new-game{
     font-family:"Martian Mono",monospace;font-size:9.5px;font-weight:600;letter-spacing:.1em;
-    text-transform:uppercase;color:var(--encre);background:var(--signal);
+    text-transform:uppercase;color:var(--ink);background:var(--highlight);
     border:0;border-radius:999px;padding:10px 16px;cursor:pointer;white-space:nowrap;
     flex:0 0 auto;transition:background .35s ease
   }
-  .btn-nouvelle:active{transform:translateY(1px)}
-  .btn-icone{
+  .btn-new-game:active{transform:translateY(1px)}
+  .icon-btn{
     flex:0 0 auto;width:38px;height:38px;display:grid;place-items:center;
-    background:transparent;border:1px solid var(--trait);border-radius:999px;
-    color:var(--clair);cursor:pointer;padding:0
+    background:transparent;border:1px solid var(--border);border-radius:999px;
+    color:var(--text);cursor:pointer;padding:0
   }
-  .btn-icone:active{transform:translateY(1px)}
-  .btn-icone svg{width:17px;height:17px}
-  .btn-icone .icone-sortir{display:none}
-  body.plein .btn-icone .icone-entrer{display:none}
-  body.plein .btn-icone .icone-sortir{display:block}
+  .icon-btn:active{transform:translateY(1px)}
+  .icon-btn svg{width:17px;height:17px}
+  .icon-btn .icon-exit{display:none}
+  .info-glyph{font-family:"Martian Mono",monospace;font-weight:800;font-size:20px;line-height:1}
+  body.fullscreen .icon-btn .icon-enter{display:none}
+  body.fullscreen .icon-btn .icon-exit{display:block}
 
-  /* ---- grille des mots ---- */
-  .grille{display:flex;flex-direction:column;gap:8px;flex:1 1 auto;min-height:0}
-  .mot{
+  /* ---- word grid ---- */
+  .grid{display:flex;flex-direction:column;gap:8px;flex:1 1 auto;min-height:0}
+  .word-tile{
     position:relative;display:flex;align-items:stretch;gap:0;flex:1 1 0;
-    background:var(--panneau);border:1px solid var(--trait);border-radius:var(--r);
+    background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);
     overflow:hidden;cursor:pointer;width:100%;padding:0;text-align:left;
     font:inherit;color:inherit;min-height:0;
     transition:background .35s ease,border-color .35s ease;
   }
-  .mot:focus-visible{outline:2px solid var(--signal);outline-offset:2px}
-  .num{
+  .word-tile:focus-visible{outline:2px solid var(--highlight);outline-offset:2px}
+  .tile-number{
     flex:0 0 48px;display:grid;place-items:center;
     font-family:"Martian Mono",monospace;font-size:19px;font-weight:800;
-    color:var(--lavande);border-right:1px solid var(--trait);
+    color:var(--accent);border-right:1px solid var(--border);
     background:rgba(0,0,0,.16);transition:color .35s ease,border-color .35s ease;
   }
-  .zone{position:relative;flex:1;display:grid;place-items:center start;padding:0 16px}
-  .texte{
+  .tile-content{position:relative;flex:1;display:grid;place-items:center start;padding:0 16px}
+  .word-text{
     font-size:clamp(17px,5.4vw,24px);font-weight:700;letter-spacing:-.01em;
     text-transform:capitalize;
     opacity:0;transform:translateY(4px);transition:opacity .22s ease,transform .22s ease
   }
-  .mot.vu .texte{opacity:1;transform:none}
-  .cache{
+  .word-tile.revealed .word-text{opacity:1;transform:none}
+  .mask{
     position:absolute;inset:0;display:flex;align-items:center;padding:0 16px;
     background:
       repeating-linear-gradient(-45deg,
-        color-mix(in srgb, var(--panneau) 88%, white 6%) 0 9px,
-        color-mix(in srgb, var(--panneau) 88%, black 10%) 9px 18px);
+        color-mix(in srgb, var(--panel) 88%, white 6%) 0 9px,
+        color-mix(in srgb, var(--panel) 88%, black 10%) 9px 18px);
     transition:transform .3s cubic-bezier(.4,0,.2,1);
   }
-  .mot.vu .cache{transform:translateX(101%)}
-  .cache em{
+  .word-tile.revealed .mask{transform:translateX(101%)}
+  .mask em{
     font-family:"Martian Mono",monospace;font-style:normal;font-size:10px;
-    letter-spacing:.24em;text-transform:uppercase;color:var(--sourdine)
+    letter-spacing:.24em;text-transform:uppercase;color:var(--muted)
   }
 
-  /* ---- code ---- */
+  /* ---- code panel ---- */
   .code{
-    background:var(--panneau);border:1px solid var(--trait);border-radius:var(--r);
+    background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);
     padding:12px;display:flex;flex-direction:column;gap:10px;flex:0 0 auto;
     transition:background .35s ease,border-color .35s ease;
   }
   .code h2{
     font-family:"Martian Mono",monospace;font-size:9px;font-weight:600;letter-spacing:.26em;
-    text-transform:uppercase;color:var(--sourdine);margin:0
+    text-transform:uppercase;color:var(--muted);margin:0
   }
-  .lattes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-  .latte{
-    background:var(--encre);border:1px solid var(--trait);border-radius:10px;
+  .code-digits{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .digit{
+    background:var(--ink);border:1px solid var(--border);border-radius:10px;
     display:grid;place-items:center;padding:10px 0;
     font-family:"Martian Mono",monospace;font-size:clamp(26px,9vw,38px);font-weight:800;
-    color:var(--signal);line-height:1;transition:border-color .35s ease,color .35s ease;
+    color:var(--highlight);line-height:1;transition:border-color .35s ease,color .35s ease;
   }
-  .code.masque .latte{color:var(--sourdine)}
-  .actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .code.hidden .digit{color:var(--muted)}
+  .btn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
   .btn{
     font-family:"Martian Mono",monospace;font-size:9.5px;font-weight:600;letter-spacing:.1em;
     text-transform:uppercase;padding:11px 8px;border-radius:10px;cursor:pointer;
-    background:transparent;color:var(--clair);border:1px solid var(--trait)
+    background:transparent;color:var(--text);border:1px solid var(--border)
   }
-  .btn.plein{background:var(--lavande);border-color:var(--lavande);color:var(--encre);transition:background .35s ease,border-color .35s ease}
+  .btn.filled{background:var(--accent);border-color:var(--accent);color:var(--ink);transition:background .35s ease,border-color .35s ease}
   .btn:active{transform:translateY(1px)}
-  .btn:focus-visible{outline:2px solid var(--signal);outline-offset:2px}
+  .btn:focus-visible{outline:2px solid var(--highlight);outline-offset:2px}
 
-  .pied{
+  .footer-hint{
     font-family:"Martian Mono",monospace;font-size:8.5px;letter-spacing:.12em;
-    color:var(--sourdine);text-align:center;text-transform:uppercase;line-height:1.4;
+    color:var(--muted);text-align:center;text-transform:uppercase;line-height:1.4;
     margin:0;flex:0 0 auto
   }
 
-  /* ---- boîte de dialogue ---- */
+  /* ---- dialogs ---- */
   dialog{
-    border:1px solid var(--trait);border-radius:var(--r);background:var(--panneau);
-    color:var(--clair);padding:22px;width:min(360px,calc(100vw - 44px));
+    border:1px solid var(--border);border-radius:var(--radius);background:var(--panel);
+    color:var(--text);padding:22px;width:min(360px,calc(100vw - 44px));
     font-family:inherit;max-height:min(560px,calc(100dvh - 60px));overflow:auto
   }
   dialog::backdrop{background:rgba(10,9,32,.75)}
   dialog h3{margin:0 0 8px;font-size:22px;font-weight:700}
-  dialog p{margin:0 0 18px;color:var(--sourdine);font-size:15px;line-height:1.5}
-  dialog .actions{grid-template-columns:1fr 1fr}
+  dialog p{margin:0 0 18px;color:var(--muted);font-size:15px;line-height:1.5}
+  dialog .btn-row{grid-template-columns:1fr 1fr}
 
-  /* ---- réglages ---- */
-  .reglage-groupe{margin-bottom:20px}
-  .reglage-titre{
+  /* ---- settings ---- */
+  .settings-group{margin-bottom:20px}
+  .settings-label{
     font-family:"Martian Mono",monospace;font-size:9px;font-weight:600;letter-spacing:.24em;
-    text-transform:uppercase;color:var(--sourdine);margin:0 0 10px
+    text-transform:uppercase;color:var(--muted);margin:0 0 10px
   }
-  .langues{display:flex;background:var(--encre);border:1px solid var(--trait);border-radius:999px;padding:3px}
-  .langue-opt{
+  .segmented{display:flex;background:var(--ink);border:1px solid var(--border);border-radius:999px;padding:3px}
+  .segmented-opt{
     flex:1;text-align:center;padding:9px 0;border-radius:999px;border:0;background:transparent;
-    color:var(--sourdine);font-family:"Martian Mono",monospace;font-size:11px;font-weight:600;
+    color:var(--muted);font-family:"Martian Mono",monospace;font-size:11px;font-weight:600;
     letter-spacing:.08em;cursor:pointer
   }
-  .langue-opt.actif{background:var(--lavande);color:var(--encre)}
-  .themes{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-  .theme-opt{
+  .segmented-opt.active{background:var(--accent);color:var(--ink)}
+  .theme-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .theme-option{
     display:flex;flex-direction:column;align-items:center;gap:6px;background:transparent;
     border:2px solid transparent;border-radius:12px;padding:8px 4px;cursor:pointer
   }
-  .theme-opt.actif{border-color:var(--clair)}
-  .theme-puce{width:34px;height:34px;border-radius:50%;border:1px solid rgba(127,127,127,.3)}
-  .theme-nom{font-family:"Martian Mono",monospace;font-size:8.5px;letter-spacing:.06em;color:var(--sourdine);text-transform:uppercase;text-align:center}
-  .dlg-fermer{
+  .theme-option.active{border-color:var(--text)}
+  .theme-swatch{width:34px;height:34px;border-radius:50%;border:1px solid rgba(127,127,127,.3)}
+  .theme-name{font-family:"Martian Mono",monospace;font-size:8.5px;letter-spacing:.06em;color:var(--muted);text-transform:uppercase;text-align:center}
+  .btn-close{
     width:100%;margin-top:4px;font-family:"Martian Mono",monospace;font-size:10px;font-weight:600;
     letter-spacing:.1em;text-transform:uppercase;padding:12px;border-radius:10px;cursor:pointer;
-    background:var(--lavande);color:var(--encre);border:0
+    background:var(--accent);color:var(--ink);border:0
   }
+
+  /* ---- info ---- */
+  .info-list{list-style:none;margin:0 0 18px;padding:0;display:flex;flex-direction:column;gap:14px}
+  .info-list li{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.45;color:var(--text)}
+  .info-num{
+    flex:0 0 22px;width:22px;height:22px;border-radius:50%;background:var(--accent);color:var(--ink);
+    display:grid;place-items:center;font-family:"Martian Mono",monospace;font-size:11px;font-weight:800
+  }
+  .info-note{font-size:13px;line-height:1.55;color:var(--muted);margin:-4px 0 18px}
+  .info-note a{color:var(--accent);font-weight:600;text-decoration:underline}
+
+  /* ---- language picker ---- */
+  .language-grid{display:flex;flex-direction:column;gap:8px}
+  .language-item{
+    display:flex;align-items:center;justify-content:space-between;gap:8px;
+    background:var(--ink);border:1px solid var(--border);border-radius:10px;
+    padding:12px 14px;cursor:pointer;color:var(--text);
+    font-family:"Familjen Grotesk",sans-serif;font-size:14px;font-weight:500;text-align:left
+  }
+  .language-item.active{border-color:var(--accent);background:color-mix(in srgb, var(--accent) 14%, var(--ink))}
+  .language-item .checkmark{width:14px;height:14px;flex:0 0 auto;color:var(--accent);opacity:0}
+  .language-item.active .checkmark{opacity:1}
 
   @media (prefers-reduced-motion:reduce){
     *{transition:none!important;animation:none!important}
@@ -182,80 +199,93 @@
 <div class="app">
 
   <header>
-    <div class="ligne-titre">
-      <p class="eyebrow" id="txtEyebrow">Grille de l'équipe</p>
-      <h1 class="marque" id="txtMarque">DÉCRYP<span>TO</span></h1>
+    <div class="title-row">
+      <h1 class="brand" id="textBrand">DECRYPTO</h1>
     </div>
-    <div class="ligne-actions">
-      <button class="btn-icone" id="btnReglages" aria-label="Réglages">
+    <div class="actions-row">
+      <button class="icon-btn" id="btnLanguage" aria-label="Langue">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      </button>
+      <button class="icon-btn" id="btnInfo" aria-label="Aide">
+        <span class="info-glyph">?</span>
+      </button>
+      <button class="icon-btn" id="btnSettings" aria-label="Réglages">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
       </button>
-      <button class="btn-icone" id="btnPleinEcran" aria-label="Plein écran" aria-pressed="false">
-        <svg class="icone-entrer" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/></svg>
-        <svg class="icone-sortir" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v3a2 2 0 0 1-2 2H4M21 8h-3a2 2 0 0 1-2-2V3M15 21v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></svg>
+      <button class="icon-btn" id="btnFullscreen" aria-label="Plein écran" aria-pressed="false">
+        <svg class="icon-enter" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/></svg>
+        <svg class="icon-exit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v3a2 2 0 0 1-2 2H4M21 8h-3a2 2 0 0 1-2-2V3M15 21v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></svg>
       </button>
-      <button class="btn-nouvelle" id="btnNouvelle">Nouvelle partie</button>
+      <button class="btn-new-game" id="btnNewGame">Nouvelle partie</button>
     </div>
   </header>
 
-  <div class="grille" id="grille"></div>
+  <div class="grid" id="grid"></div>
 
-  <section class="code masque" id="code">
-    <h2 id="txtCodeTitre">Code de transmission</h2>
-    <div class="lattes">
-      <div class="latte" id="c0">•</div>
-      <div class="latte" id="c1">•</div>
-      <div class="latte" id="c2">•</div>
+  <section class="code hidden" id="codePanel">
+    <h2 id="textCodeTitle">Code de transmission</h2>
+    <div class="code-digits">
+      <div class="digit" id="digit0">•</div>
+      <div class="digit" id="digit1">•</div>
+      <div class="digit" id="digit2">•</div>
     </div>
-    <div class="actions">
-      <button class="btn plein" id="btnVoirCode">Afficher le code</button>
-      <button class="btn" id="btnNouveauCode">Nouveau code</button>
+    <div class="btn-row">
+      <button class="btn filled" id="btnShowCode">Afficher le code</button>
+      <button class="btn" id="btnNewCode">Nouveau code</button>
     </div>
   </section>
 
-  <p class="pied" id="txtPied">Touchez un mot pour l'afficher ou le masquer</p>
+  <p class="footer-hint" id="textFooterHint">Touchez un mot pour l'afficher ou le masquer</p>
 </div>
 
-<dialog id="dlgPartie">
-  <h3 id="txtDlgPartieTitre">Nouvelle partie ?</h3>
-  <p id="txtDlgPartieCorps">Les quatre mots actuels seront remplacés.</p>
-  <div class="actions">
-    <button class="btn" id="partieNon">Annuler</button>
-    <button class="btn plein" id="partieOui">Commencer</button>
+<dialog id="dlgNewGame">
+  <h3 id="textNewGameTitle">Nouvelle partie ?</h3>
+  <p id="textNewGameBody">Les quatre mots actuels seront remplacés.</p>
+  <div class="btn-row">
+    <button class="btn" id="btnNewGameCancel">Annuler</button>
+    <button class="btn filled" id="btnNewGameStart">Commencer</button>
   </div>
 </dialog>
 
-<dialog id="dlgEcran">
-  <h3 id="txtDlgEcranTitre">Garder l'écran allumé ?</h3>
-  <p id="txtDlgEcranCorps">L'écran restera actif pendant la partie.</p>
-  <div class="actions">
-    <button class="btn" id="ecranNon">Non</button>
-    <button class="btn plein" id="ecranOui">Oui (conseillé)</button>
+<dialog id="dlgScreen">
+  <h3 id="textScreenTitle">Garder l'écran allumé ?</h3>
+  <p id="textScreenBody">L'écran restera actif pendant la partie.</p>
+  <div class="btn-row">
+    <button class="btn" id="btnScreenNo">Non</button>
+    <button class="btn filled" id="btnScreenYes">Oui (conseillé)</button>
   </div>
 </dialog>
 
-<dialog id="dlgReglages">
-  <h3 id="txtReglagesTitre">Réglages</h3>
-  <div class="reglage-groupe">
-    <p class="reglage-titre" id="txtLangueTitre">Langue</p>
-    <div class="langues">
-      <button class="langue-opt" id="langueFR" data-lang="fr">Français</button>
-      <button class="langue-opt" id="langueEN" data-lang="en">English</button>
+<dialog id="dlgInfo">
+  <h3 id="textInfoTitle">How to play</h3>
+  <ol class="info-list" id="infoList"></ol>
+  <p class="info-note" id="infoScoresheet"></p>
+  <button class="btn-close" id="btnCloseInfo">Close</button>
+</dialog>
+
+<dialog id="dlgLanguage">
+  <h3 id="textLanguageDialogTitle">Langue</h3>
+  <div class="language-grid" id="languageGrid"></div>
+</dialog>
+
+<dialog id="dlgSettings">
+  <h3 id="textSettingsTitle">Réglages</h3>
+  <div class="settings-group">
+    <p class="settings-label" id="textThemeLabel">Couleur d'équipe</p>
+    <div class="segmented" style="margin-bottom:14px">
+      <button class="segmented-opt" id="modeDark" data-mode="dark">Obscur</button>
+      <button class="segmented-opt" id="modeLight" data-mode="light">Clair</button>
     </div>
+    <div class="theme-grid" id="themeGrid"></div>
   </div>
-  <div class="reglage-groupe">
-    <p class="reglage-titre" id="txtThemeTitre">Couleur d'équipe</p>
-    <div class="themes" id="themes"></div>
-  </div>
-  <button class="dlg-fermer" id="btnFermerReglages">Fermer</button>
+  <button class="btn-close" id="btnCloseSettings">Fermer</button>
 </dialog>
 
 <script>
-/* ============ contenu bilingue ============ */
+/* ============ multilingual UI strings ============ */
 const I18N = {
   fr:{
-    docTitle:'Décrypto', htmlLang:'fr', eyebrow:"Grille de l'équipe",
-    brandPrefix:'DÉCRYP', brandSuffix:'TO',
+    docTitle:'Décrypto', htmlLang:'fr', brandText:'DÉCRYPTO',
     newGame:'Nouvelle partie', settings:'Réglages',
     fullscreenEnter:'Plein écran', fullscreenExit:'Quitter le plein écran',
     codeTitle:'Code de transmission', showCode:'Afficher le code', hideCode:'Masquer le code',
@@ -265,11 +295,21 @@ const I18N = {
     cancel:'Annuler', start:'Commencer',
     screenTitle:"Garder l'écran allumé ?", screenBody:"L'écran restera actif pendant la partie.",
     no:'Non', yes:'Oui (conseillé)',
-    settingsTitle:'Réglages', langLabel:'Langue', themeLabel:"Couleur d'équipe", close:'Fermer'
+    settingsTitle:'Réglages', langLabel:'Langue', themeLabel:"Couleur d'équipe", close:'Fermer',
+    modeDark:'Obscur', modeLight:'Clair',
+    infoLabel:'Aide', infoTitle:'Comment jouer',
+    infoSteps:[
+      "Choisissez votre langue et la couleur de votre équipe avec les icônes ci-dessus.",
+      "Appuyez sur « Nouvelle partie » pour tirer quatre mots et un code.",
+      "Touchez un mot pour l'afficher ou le masquer — seule votre équipe doit regarder.",
+      "Utilisez « Afficher le code » pour révéler le code de transmission, ou « Nouveau code » pour en tirer un autre.",
+      "Appuyez sur l'icône plein écran pour une vue plus dégagée pendant la partie."
+    ],
+    scoresheetIntro:'Envie de feuilles de score en papier ?', scoresheetLinkText:'Imprimez la feuille de score officielle',
+    scoresheetOutro:", idéalement recto verso. Pas d'imprimante ? Reproduisez simplement la mise en page sur une feuille blanche."
   },
   en:{
-    docTitle:'Decrypto', htmlLang:'en', eyebrow:"Team's grid",
-    brandPrefix:'DECRYP', brandSuffix:'TO',
+    docTitle:'Decrypto', htmlLang:'en', brandText:'DECRYPTO',
     newGame:'New game', settings:'Settings',
     fullscreenEnter:'Fullscreen', fullscreenExit:'Exit fullscreen',
     codeTitle:'Transmission code', showCode:'Show code', hideCode:'Hide code',
@@ -279,238 +319,419 @@ const I18N = {
     cancel:'Cancel', start:'Start',
     screenTitle:'Keep screen on?', screenBody:'The screen will stay awake during the game.',
     no:'No', yes:'Yes (recommended)',
-    settingsTitle:'Settings', langLabel:'Language', themeLabel:'Team colour', close:'Close'
+    settingsTitle:'Settings', langLabel:'Language', themeLabel:'Team colour', close:'Close',
+    modeDark:'Dark', modeLight:'Light',
+    infoLabel:'Help', infoTitle:'How to play',
+    infoSteps:[
+      "Pick your language and team colour from the icons above.",
+      'Tap "New game" to draw four words and a code.',
+      "Tap a word to reveal or hide it — only your team should look.",
+      'Use "Show code" to reveal the transmission code, or "New code" for a new one.',
+      "Tap the fullscreen icon for a cleaner view during play."
+    ],
+    scoresheetIntro:'Want paper scoresheets?', scoresheetLinkText:'Print the official scoresheet',
+    scoresheetOutro:", ideally double-sided. No printer? Just copy the layout onto a blank sheet of paper."
+  },
+  es:{
+    docTitle:'Decrypto', htmlLang:'es', brandText:'DECRYPTO',
+    newGame:'Nueva partida', settings:'Ajustes',
+    fullscreenEnter:'Pantalla completa', fullscreenExit:'Salir de pantalla completa',
+    codeTitle:'Código de transmisión', showCode:'Mostrar código', hideCode:'Ocultar código',
+    newCode:'Nuevo código', footerHint:'Toca una palabra para mostrarla u ocultarla',
+    tileHint:'Toca para revelar',
+    newGameTitle:'¿Nueva partida?', newGameBody:'Las cuatro palabras actuales serán reemplazadas.',
+    cancel:'Cancelar', start:'Empezar',
+    screenTitle:'¿Mantener la pantalla encendida?', screenBody:'La pantalla permanecerá activa durante la partida.',
+    no:'No', yes:'Sí (recomendado)',
+    settingsTitle:'Ajustes', langLabel:'Idioma', themeLabel:'Color de equipo', close:'Cerrar',
+    modeDark:'Oscuro', modeLight:'Claro',
+    infoLabel:'Ayuda', infoTitle:'Cómo jugar',
+    infoSteps:[
+      "Elige tu idioma y el color de tu equipo con los iconos de arriba.",
+      'Toca "Nueva partida" para sacar cuatro palabras y un código.',
+      "Toca una palabra para mostrarla u ocultarla — solo tu equipo debería mirar.",
+      'Usa "Mostrar código" para revelar el código de transmisión, o "Nuevo código" para sacar otro.',
+      "Toca el icono de pantalla completa para una vista más despejada durante la partida."
+    ],
+    scoresheetIntro:'¿Quieres hojas de puntuación en papel?', scoresheetLinkText:'Imprime la hoja de puntuación oficial',
+    scoresheetOutro:", idealmente a doble cara. ¿Sin impresora? Copia el diseño en una hoja en blanco."
+  },
+  de:{
+    docTitle:'Decrypto', htmlLang:'de', brandText:'DECRYPTO',
+    newGame:'Neues Spiel', settings:'Einstellungen',
+    fullscreenEnter:'Vollbild', fullscreenExit:'Vollbild beenden',
+    codeTitle:'Übertragungscode', showCode:'Code anzeigen', hideCode:'Code verbergen',
+    newCode:'Neuer Code', footerHint:'Tippe auf ein Wort, um es anzuzeigen oder zu verbergen',
+    tileHint:'Tippen zum Anzeigen',
+    newGameTitle:'Neues Spiel?', newGameBody:'Die vier aktuellen Wörter werden ersetzt.',
+    cancel:'Abbrechen', start:'Starten',
+    screenTitle:'Bildschirm eingeschaltet lassen?', screenBody:'Der Bildschirm bleibt während des Spiels aktiv.',
+    no:'Nein', yes:'Ja (empfohlen)',
+    settingsTitle:'Einstellungen', langLabel:'Sprache', themeLabel:'Teamfarbe', close:'Schließen',
+    modeDark:'Dunkel', modeLight:'Hell',
+    infoLabel:'Hilfe', infoTitle:'Spielanleitung',
+    infoSteps:[
+      "Wähle deine Sprache und die Teamfarbe über die Symbole oben.",
+      "Tippe auf „Neues Spiel“, um vier Wörter und einen Code zu ziehen.",
+      "Tippe auf ein Wort, um es anzuzeigen oder zu verbergen — nur dein Team sollte hinsehen.",
+      "Nutze „Code anzeigen“, um den Übertragungscode aufzudecken, oder „Neuer Code“ für einen neuen.",
+      "Tippe auf das Vollbild-Symbol für eine übersichtlichere Ansicht während des Spiels."
+    ],
+    scoresheetIntro:'Möchtest du Punkteblätter aus Papier?', scoresheetLinkText:'Drucke das offizielle Punkteblatt',
+    scoresheetOutro:", idealerweise beidseitig. Kein Drucker? Übertrage das Layout einfach auf ein leeres Blatt."
+  },
+  it:{
+    docTitle:'Decrypto', htmlLang:'it', brandText:'DECRYPTO',
+    newGame:'Nuova partita', settings:'Impostazioni',
+    fullscreenEnter:'Schermo intero', fullscreenExit:'Esci da schermo intero',
+    codeTitle:'Codice di trasmissione', showCode:'Mostra codice', hideCode:'Nascondi codice',
+    newCode:'Nuovo codice', footerHint:'Tocca una parola per mostrarla o nasconderla',
+    tileHint:'Tocca per rivelare',
+    newGameTitle:'Nuova partita?', newGameBody:'Le quattro parole attuali verranno sostituite.',
+    cancel:'Annulla', start:'Inizia',
+    screenTitle:'Mantenere lo schermo acceso?', screenBody:'Lo schermo rimarrà attivo durante la partita.',
+    no:'No', yes:'Sì (consigliato)',
+    settingsTitle:'Impostazioni', langLabel:'Lingua', themeLabel:'Colore squadra', close:'Chiudi',
+    modeDark:'Scuro', modeLight:'Chiaro',
+    infoLabel:'Aiuto', infoTitle:'Come giocare',
+    infoSteps:[
+      "Scegli la lingua e il colore della squadra con le icone in alto.",
+      'Tocca "Nuova partita" per pescare quattro parole e un codice.',
+      "Tocca una parola per mostrarla o nasconderla — solo la tua squadra dovrebbe guardare.",
+      'Usa "Mostra codice" per rivelare il codice di trasmissione, oppure "Nuovo codice" per pescarne un altro.',
+      "Tocca l'icona schermo intero per una visuale più pulita durante la partita."
+    ],
+    scoresheetIntro:'Vuoi i fogli punteggio di carta?', scoresheetLinkText:'Stampa il foglio punteggio ufficiale',
+    scoresheetOutro:", idealmente fronte-retro. Niente stampante? Riproduci semplicemente il layout su un foglio bianco."
+  },
+  pt:{
+    docTitle:'Decrypto', htmlLang:'pt', brandText:'DECRYPTO',
+    newGame:'Novo jogo', settings:'Definições',
+    fullscreenEnter:'Ecrã inteiro', fullscreenExit:'Sair do ecrã inteiro',
+    codeTitle:'Código de transmissão', showCode:'Mostrar código', hideCode:'Ocultar código',
+    newCode:'Novo código', footerHint:'Toca numa palavra para a mostrar ou ocultar',
+    tileHint:'Toca para revelar',
+    newGameTitle:'Novo jogo?', newGameBody:'As quatro palavras atuais serão substituídas.',
+    cancel:'Cancelar', start:'Começar',
+    screenTitle:'Manter o ecrã ligado?', screenBody:'O ecrã permanecerá ativo durante o jogo.',
+    no:'Não', yes:'Sim (recomendado)',
+    settingsTitle:'Definições', langLabel:'Idioma', themeLabel:'Cor da equipa', close:'Fechar',
+    modeDark:'Escuro', modeLight:'Claro',
+    infoLabel:'Ajuda', infoTitle:'Como jogar',
+    infoSteps:[
+      "Escolhe o idioma e a cor da equipa nos ícones acima.",
+      'Toca em "Novo jogo" para tirar quatro palavras e um código.',
+      "Toca numa palavra para a mostrar ou ocultar — só a tua equipa deve olhar.",
+      'Usa "Mostrar código" para revelar o código de transmissão, ou "Novo código" para tirar outro.',
+      "Toca no ícone de ecrã inteiro para uma vista mais limpa durante o jogo."
+    ],
+    scoresheetIntro:'Queres folhas de pontuação em papel?', scoresheetLinkText:'Imprime a folha de pontuação oficial',
+    scoresheetOutro:", idealmente frente e verso. Sem impressora? Reproduz o layout numa folha em branco."
   }
 };
+
+/* Official printable Decrypto scoresheet (BoardGameGeek file page — stable, non-expiring link). */
+const SCORESHEET_URL = 'https://boardgamegeek.com/filepage/207786/decrypto-scoresheet-2-sheets-in-1-a4-paper';
+
+/* languages shown in the picker, with their native display name */
+const LANGUAGES = [
+  {id:'de', name:'Deutsch', flag:'🇩🇪'},
+  {id:'en', name:'English', flag:'🇬🇧'},
+  {id:'es', name:'Español', flag:'🇪🇸'},
+  {id:'fr', name:'Français', flag:'🇫🇷'},
+  {id:'it', name:'Italiano', flag:'🇮🇹'},
+  {id:'pt', name:'Português', flag:'🇵🇹'}
+];
 
 /* Words chosen for having several possible meanings/associations,
    which is what makes clue-giving in Decrypto interesting. */
 const WORDS = {
   fr:["avocat","banque","bureau","but","cadre","carte","chaîne","champ","chat","clé","col","cour","coupe","cours","coussin","feuille","glace","grève","lettre","livre","manche","mine","moule","mouton","note","page","pièce","pile","plume","pomme","porte","poste","pouce","quart","réseau","robe","rose","sac","souris","temps","tour","verre","vis","voile","volant","cible","cheville","écran","patte","langue","pointe","souche","tuile","vol","arc","bar","base","batterie","boîte","bouche","canon","capital","casque","cave","chambre","char","comprimé","corps","coupure","disque","échelle","éclat","épine","étoile","façade","faute","fond","forme","front","gomme","grade","groupe","herbe","image","jeu","marche","marque","masse","mode","mur","ordre","organe","orgue","paire","panier","papier","parfum","patin","peau","phare","pied","plaque","plan","plat","poids","point","pont","pouls","presse","prise","puce","queue","rail","rayon","régime","rein","requin","ressort","robinet","ruche","ruse","sabot","salle","sang","sein","siège","signe","socle","soldat","soleil","sommet","source","station","style","sujet","table","tache","talon","tapis","teint","terrain","tête","timbre","tissu","ton","torche","trace","train","trait","tronc","trou","truc","tube","type","usine","vague","valeur","ventre","veste","vitre","voix","zone"],
-  en:["bank","spring","bat","bar","bolt","bow","crane","date","fan","jam","key","note","palm","park","pen","pitcher","plant","pool","pound","punch","ring","rock","rose","scale","seal","square","staple","star","stick","story","tank","tie","watch","well","wave","iron","organ","current","match","chest","arm","present","novel","fair","board","bass","chip","club","court","den","drill","fine","fly","gum","hide","kid","light","lock","mint","nail","pit","pupil","ram","saw","sole","spirit","tap","tire","trunk","yard","cell","cast","charge","capital","degree","figure","ground","interest","issue","race","ruler","sentence","spell","table","tender","trip","type","volume","band","bark","batter","beam","bill","block","bluff","brace","brief","buckle","bulb","bunk","cabinet","camp","cap","case","chain","channel","charm","clip","cloud","coach","coast","cone","content","cord","counter","cover","crack","cricket","crop","crown","cue","cup","dash","deck","desert","draft","drop","drum","duck","era","feature","field","film","flag","flat","flock","form","frame","gap","gauge","glass","grain","grip","hail","hamper","hoard","host","jar","jelly","jet","joint","junk","kernel","latch","leaf","ledge","limb","line","litter","lodge","loft","log","mane","mask","mast","mine","mold","net","nut","pane","pass","patch","pier","pipe","pitch","plot","plug","pod","point","pole","port","post","pot","pump","quill","rack","raft","rail","rank","ray","reed","reel","rib","ridge","rig","rind","rink","rod","roll","root","row","sack","saddle","sail","sap","scoop","screen","seat","sheet","shell","shore","shot","shoulder","sink","skin","sleeve","slip","slug","snap","sock","spike","spine","spool","spoon","spot","spray","spur","stall","stalk","stamp","stand","stem","stitch","stock","stool","storm","strand","straw","stream","strip","stroke","stump","suit","swing","switch","tab","tack","tag","tail","target","throat","thumb","tide","tissue","toll","tomb","torch","track","trap","tray","tread","trough","tube","tuck","tug","tusk","twig","valve","vault","vent","vine","wagon","waist","wallet","wand","wax","web","wick","wing","wire","wreck","wrist","yolk","zone"]
+  en:["bank","spring","bat","bar","bolt","bow","crane","date","fan","jam","key","note","palm","park","pen","pitcher","plant","pool","pound","punch","ring","rock","rose","scale","seal","square","staple","star","stick","story","tank","tie","watch","well","wave","iron","organ","current","match","chest","arm","present","novel","fair","board","bass","chip","club","court","den","drill","fine","fly","gum","hide","kid","light","lock","mint","nail","pit","pupil","ram","saw","sole","spirit","tap","tire","trunk","yard","cell","cast","charge","capital","degree","figure","ground","interest","issue","race","ruler","sentence","spell","table","tender","trip","type","volume","band","bark","batter","beam","bill","block","bluff","brace","brief","buckle","bulb","bunk","cabinet","camp","cap","case","chain","channel","charm","clip","cloud","coach","coast","cone","content","cord","counter","cover","crack","cricket","crop","crown","cue","cup","dash","deck","desert","draft","drop","drum","duck","era","feature","field","film","flag","flat","flock","form","frame","gap","gauge","glass","grain","grip","hail","hamper","hoard","host","jar","jelly","jet","joint","junk","kernel","latch","leaf","ledge","limb","line","litter","lodge","loft","log","mane","mask","mast","mine","mold","net","nut","pane","pass","patch","pier","pipe","pitch","plot","plug","pod","point","pole","port","post","pot","pump","quill","rack","raft","rail","rank","ray","reed","reel","rib","ridge","rig","rind","rink","rod","roll","root","row","sack","saddle","sail","sap","scoop","screen","seat","sheet","shell","shore","shot","shoulder","sink","skin","sleeve","slip","slug","snap","sock","spike","spine","spool","spoon","spot","spray","spur","stall","stalk","stamp","stand","stem","stitch","stock","stool","storm","strand","straw","stream","strip","stroke","stump","suit","swing","switch","tab","tack","tag","tail","target","throat","thumb","tide","tissue","toll","tomb","torch","track","trap","tray","tread","trough","tube","tuck","tug","tusk","twig","valve","vault","vent","vine","wagon","waist","wallet","wand","wax","web","wick","wing","wire","wreck","wrist","yolk","zone"],
+  es:["banco","llave","copa","vela","cola","gato","muñeca","pila","mango","lengua","papa","sal","banda","plancha","grifo","tiempo","campo","cuenta","corte","gorra","pico","oso","muela","sierra","pluma","radio","cabo","timbre","grado","mono","naranja","cometa","palma","sobre","suela","tornillo","vaso","yema","anillo","arco","botella","brazo","cadena","campana","cañón","capital","carta","casco","cinta","clavo","cuchara","cuero","diente","disco","espejo","estrella","falda","farol","foco","fuente","globo","grano","hilo","hoja","hueso","jarra","lámpara","lata","lazo","letra","libra","lima","maceta","maleta","manta","mecha","muro","nube","nudo","ojo","olla","pared","pasta","pecho","pez","piel","pierna","puente","puerta","puño","rama","red","reloj","rueda","saco","semilla","silla","sombra","sombrero","sopa","tapa","techo","tela","tenedor","timón","torre","trampa","tubo","uña","viga","zapato"],
+  de:["Bank","Schloss","Kiefer","Golf","Birne","Decke","Feder","Flügel","Krone","Mutter","Note","Pass","Strauß","Bogen","Ball","Schere","Löffel","Kamm","Blatt","Fell","Hahn","Kern","Knoten","Leiter","Licht","Mine","Ring","Rose","Rücken","Schale","Schuppe","Stern","Stift","Strom","Tafel","Tasche","Ton","Trommel","Wurzel","Zahn","Zunge","Auge","Bein","Blume","Boden","Brille","Brust","Ecke","Fahne","Feld","Fenster","Finger","Fluss","Frucht","Glas","Grund","Hand","Haut","Herz","Himmel","Holz","Horn","Hut","Insel","Kabel","Kappe","Karte","Kasten","Kelle","Kette","Kissen","Klappe","Klinge","Knopf","Koffer","Korb","Kraft","Kreis","Kugel","Lampe","Leder","Leine","Linie","Loch","Mund","Nadel","Nagel","Nase","Nest","Netz","Ofen","Ohr","Pfeife","Pfeil","Platte","Rad","Rahmen","Rand","Riegel","Rinde","Rohr","Sack","Sattel","Schacht","Schiene","Schirm","Schlange","Schleife","Schnabel","Schuh","Seife","Seil","Spiegel","Spitze","Stab","Stange","Streifen","Tinte","Topf","Tor","Trichter","Tuch","Tür","Wange","Weste","Zange","Zaun","Zelt","Zweig"],
+  it:["banca","chiave","foglio","penna","vela","coda","pila","mano","collo","fungo","pizzo","gomma","cane","lingua","grado","pesca","calcio","riso","scala","tavola","campana","corno","corda","vite","timbro","pianta","tacco","suola","stella","pelle","petto","dito","osso","unghia","naso","occhio","bocca","orecchio","cuore","testa","gamba","braccio","spalla","schiena","fronte","vetro","specchio","lampada","candela","cintura","tasca","borsa","valigia","zaino","cappello","scarpa","guanto","sciarpa","bottone","cerniera","fibbia","anello","collana","bracciale","orologio","radio","chiodo","martello","sega","pinza","forbici","ago","filo","nodo","rete","ponte","porta","finestra","muro","tetto","colonna","torre","campo","bosco","fiume","lago","mare","montagna","collina","valle","roccia","sasso","sabbia","nuvola","fulmine","tuono","vento","pioggia","neve","sole","luna","cielo","terra","fuoco","acqua","aria","ghiaccio","fiamma","cenere","fumo","radice","ramo","tronco","corteccia","seme","frutto","fiore"],
+  pt:["banco","chave","colher","copo","taça","vela","cola","pilha","unha","mão","língua","grau","riso","escada","mesa","sino","corda","parafuso","planta","salto","sola","estrela","pele","peito","dedo","osso","nariz","olho","boca","orelha","coração","cabeça","perna","braço","ombro","costas","testa","vidro","espelho","lâmpada","cinto","bolso","bolsa","mala","mochila","chapéu","sapato","luva","botão","fivela","anel","colar","pulseira","relógio","rádio","prego","martelo","serra","alicate","tesoura","agulha","fio","nó","rede","ponte","porta","janela","muro","telhado","coluna","torre","campo","floresta","rio","lago","mar","montanha","colina","vale","rocha","pedra","areia","nuvem","relâmpago","trovão","vento","chuva","neve","sol","lua","céu","terra","fogo","água","ar","gelo","chama","cinza","fumaça","raiz","ramo","tronco","casca","semente","fruto","flor","folha","galho"]
 };
 
-/* ============ thèmes ============ */
+/* ============ colour themes ============ */
+/* Each theme pairs an accent + highlight hue with its own dark and light neutral set. */
 const THEMES = [
-  {id:'violet', fr:'Violet', en:'Violet', encre:'#14133A', panneau:'#1E1D4E', trait:'#35347A', lavande:'#9B8CFF', signal:'#FFD24A', sourdine:'#8B89C4', clair:'#EDEBFA'},
-  {id:'corail', fr:'Corail', en:'Coral', encre:'#1F1512', panneau:'#2B1D18', trait:'#4A342B', lavande:'#FF8C6B', signal:'#FFD24A', sourdine:'#B78E80', clair:'#F5EDE9'},
-  {id:'emeraude', fr:'Émeraude', en:'Emerald', encre:'#0E1F1A', panneau:'#152D25', trait:'#26493C', lavande:'#4CD9A0', signal:'#FFD24A', sourdine:'#7FB3A0', clair:'#E8F5EF'},
-  {id:'azur', fr:'Azur', en:'Azure', encre:'#0E1826', panneau:'#152A40', trait:'#264868', lavande:'#5EB3FF', signal:'#FFD24A', sourdine:'#7FA3C4', clair:'#EAF3FF'},
-  {id:'magenta', fr:'Magenta', en:'Magenta', encre:'#210D1B', panneau:'#331327', trait:'#552041', lavande:'#FF6FC0', signal:'#FFD24A', sourdine:'#C284AC', clair:'#FBEAF4'},
-  {id:'ambre', fr:'Ambre', en:'Amber', encre:'#211505', panneau:'#332008', trait:'#573510', lavande:'#FFB454', signal:'#5EEAD4', sourdine:'#C4A47E', clair:'#FBF1E3'},
-  {id:'clair', fr:'Clair', en:'Light', encre:'#F7F7FB', panneau:'#FFFFFF', trait:'#E3E1F0', lavande:'#5B4FE9', signal:'#FF5A36', sourdine:'#6F6D91', clair:'#1B1A33'}
+  {id:'violet', fr:'Violet', en:'Violet', accent:'#9B8CFF', highlight:'#FFD24A',
+    dark:{ink:'#14133A', panel:'#1E1D4E', border:'#35347A', muted:'#8B89C4', text:'#EDEBFA'},
+    light:{ink:'#F5F4FC', panel:'#FFFFFF', border:'#E2DFF5', muted:'#726F99', text:'#1E1B3D'}},
+  {id:'coral', fr:'Corail', en:'Coral', accent:'#FF8C6B', highlight:'#FFD24A',
+    dark:{ink:'#1F1512', panel:'#2B1D18', border:'#4A342B', muted:'#B78E80', text:'#F5EDE9'},
+    light:{ink:'#FBF4F1', panel:'#FFFFFF', border:'#F0DED5', muted:'#96766A', text:'#2E1912'}},
+  {id:'emerald', fr:'Émeraude', en:'Emerald', accent:'#4CD9A0', highlight:'#FFD24A',
+    dark:{ink:'#0E1F1A', panel:'#152D25', border:'#26493C', muted:'#7FB3A0', text:'#E8F5EF'},
+    light:{ink:'#F2FAF6', panel:'#FFFFFF', border:'#D9EEE3', muted:'#5E8F7A', text:'#0F2A20'}},
+  {id:'azure', fr:'Azur', en:'Azure', accent:'#5EB3FF', highlight:'#FFD24A',
+    dark:{ink:'#0E1826', panel:'#152A40', border:'#264868', muted:'#7FA3C4', text:'#EAF3FF'},
+    light:{ink:'#F1F7FC', panel:'#FFFFFF', border:'#D9E8F5', muted:'#5F84A8', text:'#102338'}},
+  {id:'magenta', fr:'Magenta', en:'Magenta', accent:'#FF6FC0', highlight:'#FFD24A',
+    dark:{ink:'#210D1B', panel:'#331327', border:'#552041', muted:'#C284AC', text:'#FBEAF4'},
+    light:{ink:'#FBF2F8', panel:'#FFFFFF', border:'#F2DCEB', muted:'#9A6C89', text:'#2E1226'}},
+  {id:'amber', fr:'Ambre', en:'Amber', accent:'#FFB454', highlight:'#5EEAD4',
+    dark:{ink:'#211505', panel:'#332008', border:'#573510', muted:'#C4A47E', text:'#FBF1E3'},
+    light:{ink:'#FBF6EE', panel:'#FFFFFF', border:'#F0E2C7', muted:'#93805B', text:'#2A1D08'}}
 ];
 
-/* ============ état ============ */
-let etat = {lang:'fr', theme:'violet'};
+/* ============ app state ============ */
+let state = {lang:'en', theme:'violet', mode:'dark'};
 try{
-  const sauvegarde = JSON.parse(localStorage.getItem('decrypto-config') || 'null');
-  if(sauvegarde && sauvegarde.lang && sauvegarde.theme) etat = sauvegarde;
-}catch(e){ /* stockage indisponible, on reste sur les valeurs par défaut */ }
+  const saved = JSON.parse(localStorage.getItem('decrypto-config') || 'null');
+  if(saved && saved.lang && saved.theme) state = Object.assign(state, saved);
+}catch(e){ /* storage unavailable, fall back to defaults */ }
 
-function sauvegarder(){
-  try{ localStorage.setItem('decrypto-config', JSON.stringify(etat)); }catch(e){}
+function save(){
+  try{ localStorage.setItem('decrypto-config', JSON.stringify(state)); }catch(e){}
 }
 
-/* ============ éléments ============ */
-const grille = document.getElementById('grille');
-const panneauCode = document.getElementById('code');
-const lattes = [0,1,2].map(i => document.getElementById('c'+i));
-const btnVoirCode = document.getElementById('btnVoirCode');
-let codeActuel = [], codeVisible = false, veille = null;
+/* ============ DOM references ============ */
+const grid = document.getElementById('grid');
+const codePanel = document.getElementById('codePanel');
+const codeDigits = [0,1,2].map(i => document.getElementById('digit'+i));
+const btnShowCode = document.getElementById('btnShowCode');
+let currentCode = [], codeVisible = false, wakeLock = null;
 
-/* ============ langue ============ */
-function appliquerLangue(lang, redessiner){
-  etat.lang = lang;
+/* ============ language ============ */
+function applyLanguage(lang, redraw){
+  state.lang = lang;
   const t = I18N[lang];
   document.documentElement.lang = t.htmlLang;
   document.title = t.docTitle;
-  document.getElementById('txtEyebrow').textContent = t.eyebrow;
-  document.getElementById('txtMarque').innerHTML = t.brandPrefix + '<span>' + t.brandSuffix + '</span>';
-  document.getElementById('btnNouvelle').textContent = t.newGame;
-  document.getElementById('btnReglages').setAttribute('aria-label', t.settings);
-  document.getElementById('btnPleinEcran').setAttribute('aria-label', estPlein() ? t.fullscreenExit : t.fullscreenEnter);
-  document.getElementById('txtCodeTitre').textContent = t.codeTitle;
-  btnVoirCode.textContent = codeVisible ? t.hideCode : t.showCode;
-  document.getElementById('btnNouveauCode').textContent = t.newCode;
-  document.getElementById('txtPied').textContent = t.footerHint;
-  document.querySelectorAll('.cache em').forEach(el => el.textContent = t.tileHint);
-  document.getElementById('txtDlgPartieTitre').textContent = t.newGameTitle;
-  document.getElementById('txtDlgPartieCorps').textContent = t.newGameBody;
-  document.getElementById('partieNon').textContent = t.cancel;
-  document.getElementById('partieOui').textContent = t.start;
-  document.getElementById('txtDlgEcranTitre').textContent = t.screenTitle;
-  document.getElementById('txtDlgEcranCorps').textContent = t.screenBody;
-  document.getElementById('ecranNon').textContent = t.no;
-  document.getElementById('ecranOui').textContent = t.yes;
-  document.getElementById('txtReglagesTitre').textContent = t.settingsTitle;
-  document.getElementById('txtLangueTitre').textContent = t.langLabel;
-  document.getElementById('txtThemeTitre').textContent = t.themeLabel;
-  document.getElementById('btnFermerReglages').textContent = t.close;
-  document.getElementById('langueFR').classList.toggle('actif', lang==='fr');
-  document.getElementById('langueEN').classList.toggle('actif', lang==='en');
-  document.querySelectorAll('.theme-nom').forEach(el=>{
+  document.getElementById('textBrand').textContent = t.brandText;
+  document.getElementById('btnNewGame').textContent = t.newGame;
+  document.getElementById('btnSettings').setAttribute('aria-label', t.settings);
+  document.getElementById('btnFullscreen').setAttribute('aria-label', isFullscreen() ? t.fullscreenExit : t.fullscreenEnter);
+  document.getElementById('textCodeTitle').textContent = t.codeTitle;
+  btnShowCode.textContent = codeVisible ? t.hideCode : t.showCode;
+  document.getElementById('btnNewCode').textContent = t.newCode;
+  document.getElementById('textFooterHint').textContent = t.footerHint;
+  document.querySelectorAll('.mask em').forEach(el => el.textContent = t.tileHint);
+  document.getElementById('textNewGameTitle').textContent = t.newGameTitle;
+  document.getElementById('textNewGameBody').textContent = t.newGameBody;
+  document.getElementById('btnNewGameCancel').textContent = t.cancel;
+  document.getElementById('btnNewGameStart').textContent = t.start;
+  document.getElementById('textScreenTitle').textContent = t.screenTitle;
+  document.getElementById('textScreenBody').textContent = t.screenBody;
+  document.getElementById('btnScreenNo').textContent = t.no;
+  document.getElementById('btnScreenYes').textContent = t.yes;
+  document.getElementById('textSettingsTitle').textContent = t.settingsTitle;
+  document.getElementById('textLanguageDialogTitle').textContent = t.langLabel;
+  document.getElementById('btnLanguage').setAttribute('aria-label', t.langLabel);
+  document.getElementById('btnInfo').setAttribute('aria-label', t.infoLabel);
+  document.getElementById('textInfoTitle').textContent = t.infoTitle;
+  document.getElementById('btnCloseInfo').textContent = t.close;
+  renderInfoList(t.infoSteps);
+  document.getElementById('infoScoresheet').innerHTML =
+    t.scoresheetIntro + ' <a href="'+SCORESHEET_URL+'" target="_blank" rel="noopener noreferrer">'+t.scoresheetLinkText+'</a>'+t.scoresheetOutro;
+  document.getElementById('textThemeLabel').textContent = t.themeLabel;
+  document.getElementById('btnCloseSettings').textContent = t.close;
+  document.querySelectorAll('.language-item').forEach(el => el.classList.toggle('active', el.dataset.lang===lang));
+  document.getElementById('modeDark').textContent = t.modeDark;
+  document.getElementById('modeLight').textContent = t.modeLight;
+  document.querySelectorAll('.theme-name').forEach(el=>{
     const theme = THEMES.find(x=>x.id===el.dataset.theme);
     if(theme) el.textContent = theme[lang];
   });
-  sauvegarder();
-  if(redessiner){
-    dessinerGrille(tirerMots());
-    codeActuel = tirerCode();
-    afficherCode(false);
+  save();
+  if(redraw){
+    renderGrid(drawWords());
+    currentCode = drawCode();
+    showCode(false);
   }
 }
 
-/* ============ thème couleur ============ */
-function appliquerTheme(id, sauvegarderEtat){
-  const theme = THEMES.find(x=>x.id===id) || THEMES[0];
-  etat.theme = theme.id;
-  const racine = document.documentElement.style;
-  racine.setProperty('--encre', theme.encre);
-  racine.setProperty('--panneau', theme.panneau);
-  racine.setProperty('--trait', theme.trait);
-  racine.setProperty('--lavande', theme.lavande);
-  racine.setProperty('--signal', theme.signal);
-  racine.setProperty('--sourdine', theme.sourdine);
-  racine.setProperty('--clair', theme.clair);
-  document.querySelector('meta[name="theme-color"]').setAttribute('content', theme.encre);
-  document.querySelectorAll('.theme-opt').forEach(el => el.classList.toggle('actif', el.dataset.theme===theme.id));
-  if(sauvegarderEtat) sauvegarder();
-}
-
-function construireThemes(){
-  const conteneur = document.getElementById('themes');
-  conteneur.innerHTML = '';
-  THEMES.forEach(theme=>{
-    const b = document.createElement('button');
-    b.className = 'theme-opt';
-    b.type = 'button';
-    b.dataset.theme = theme.id;
-    b.innerHTML = '<span class="theme-puce" style="background:'+theme.lavande+'"></span><span class="theme-nom" data-theme="'+theme.id+'">'+theme[etat.lang]+'</span>';
-    b.addEventListener('click', ()=> appliquerTheme(theme.id, true));
-    conteneur.appendChild(b);
+function renderInfoList(steps){
+  const list = document.getElementById('infoList');
+  list.innerHTML = '';
+  steps.forEach((step,i)=>{
+    const li = document.createElement('li');
+    li.innerHTML = '<span class="info-num">'+(i+1)+'</span><span>'+step+'</span>';
+    list.appendChild(li);
   });
 }
 
-/* ============ mots & grille ============ */
-function tirerMots(){
-  const pool = WORDS[etat.lang].slice();
-  const choix = [];
-  for(let i=0;i<4;i++){
-    choix.push(pool.splice(Math.floor(Math.random()*pool.length),1)[0]);
-  }
-  return choix;
+function buildLanguageList(){
+  const container = document.getElementById('languageGrid');
+  container.innerHTML = '';
+  LANGUAGES.forEach(language=>{
+    const b = document.createElement('button');
+    b.className = 'language-item';
+    b.type = 'button';
+    b.dataset.lang = language.id;
+    b.innerHTML = '<span>'+language.flag+'&nbsp;&nbsp;'+language.name+'</span><svg class="checkmark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+    b.addEventListener('click', ()=> chooseLanguage(language.id));
+    container.appendChild(b);
+  });
+}
+function chooseLanguage(id){
+  applyLanguage(id, true);
+  dlgLanguage.close();
 }
 
-function dessinerGrille(mots){
-  grille.innerHTML = '';
-  mots.forEach((mot,i)=>{
+/* ============ colour theme ============ */
+function applyPalette(shouldSave){
+  const theme = THEMES.find(x=>x.id===state.theme) || THEMES[0];
+  const base = state.mode === 'light' ? theme.light : theme.dark;
+  const root = document.documentElement.style;
+  root.setProperty('--ink', base.ink);
+  root.setProperty('--panel', base.panel);
+  root.setProperty('--border', base.border);
+  root.setProperty('--accent', theme.accent);
+  root.setProperty('--highlight', theme.highlight);
+  root.setProperty('--muted', base.muted);
+  root.setProperty('--text', base.text);
+  document.querySelector('meta[name="theme-color"]').setAttribute('content', base.ink);
+  document.querySelectorAll('.theme-option').forEach(el => el.classList.toggle('active', el.dataset.theme===theme.id));
+  document.querySelectorAll('.segmented-opt').forEach(el => el.classList.toggle('active', el.dataset.mode===state.mode));
+  if(shouldSave) save();
+}
+
+function chooseTheme(id){ state.theme = id; applyPalette(true); }
+function chooseMode(mode){ state.mode = mode; applyPalette(true); }
+
+function buildThemeList(){
+  const container = document.getElementById('themeGrid');
+  container.innerHTML = '';
+  THEMES.forEach(theme=>{
     const b = document.createElement('button');
-    b.className = 'mot';
+    b.className = 'theme-option';
+    b.type = 'button';
+    b.dataset.theme = theme.id;
+    b.innerHTML = '<span class="theme-swatch" style="background:'+theme.accent+'"></span><span class="theme-name" data-theme="'+theme.id+'">'+theme[state.lang]+'</span>';
+    b.addEventListener('click', ()=> chooseTheme(theme.id));
+    container.appendChild(b);
+  });
+}
+
+/* ============ words & grid ============ */
+function drawWords(){
+  const pool = WORDS[state.lang].slice();
+  const picks = [];
+  for(let i=0;i<4;i++){
+    picks.push(pool.splice(Math.floor(Math.random()*pool.length),1)[0]);
+  }
+  return picks;
+}
+
+function renderGrid(words){
+  grid.innerHTML = '';
+  words.forEach((word,i)=>{
+    const b = document.createElement('button');
+    b.className = 'word-tile';
     b.type = 'button';
     b.setAttribute('aria-pressed','false');
     b.innerHTML =
-      '<span class="num">'+(i+1)+'</span>'+
-      '<span class="zone"><span class="texte"></span>'+
-      '<span class="cache"><em>'+I18N[etat.lang].tileHint+'</em></span></span>';
-    b.querySelector('.texte').textContent = mot;
+      '<span class="tile-number">'+(i+1)+'</span>'+
+      '<span class="tile-content"><span class="word-text"></span>'+
+      '<span class="mask"><em>'+I18N[state.lang].tileHint+'</em></span></span>';
+    b.querySelector('.word-text').textContent = word;
     b.addEventListener('click',()=>{
-      const vu = b.classList.toggle('vu');
-      b.setAttribute('aria-pressed', vu ? 'true':'false');
+      const revealed = b.classList.toggle('revealed');
+      b.setAttribute('aria-pressed', revealed ? 'true':'false');
     });
-    grille.appendChild(b);
+    grid.appendChild(b);
   });
 }
 
 /* ============ code ============ */
-function tirerCode(){
+function drawCode(){
   const n = [1,2,3,4];
   const c = [];
   for(let i=0;i<3;i++) c.push(n.splice(Math.floor(Math.random()*n.length),1)[0]);
   return c;
 }
 
-function afficherCode(visible){
+function showCode(visible){
   codeVisible = visible;
-  panneauCode.classList.toggle('masque',!visible);
-  btnVoirCode.textContent = visible ? I18N[etat.lang].hideCode : I18N[etat.lang].showCode;
-  lattes.forEach((el,i)=> el.textContent = visible ? codeActuel[i] : '•');
+  codePanel.classList.toggle('hidden',!visible);
+  btnShowCode.textContent = visible ? I18N[state.lang].hideCode : I18N[state.lang].showCode;
+  codeDigits.forEach((el,i)=> el.textContent = visible ? currentCode[i] : '•');
 }
 
-function brouiller(){
-  const reduit = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if(!codeVisible || reduit){ afficherCode(codeVisible); return; }
-  let tours = 0;
+function scrambleCode(){
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(!codeVisible || reducedMotion){ showCode(codeVisible); return; }
+  let ticks = 0;
   const id = setInterval(()=>{
-    lattes.forEach(el => el.textContent = 1 + Math.floor(Math.random()*4));
-    if(++tours > 7){ clearInterval(id); afficherCode(true); }
+    codeDigits.forEach(el => el.textContent = 1 + Math.floor(Math.random()*4));
+    if(++ticks > 7){ clearInterval(id); showCode(true); }
   },45);
 }
 
-function nouveauCode(){
-  codeActuel = tirerCode();
-  brouiller();
+function generateNewCode(){
+  currentCode = drawCode();
+  scrambleCode();
 }
 
-btnVoirCode.addEventListener('click',()=>afficherCode(!codeVisible));
-document.getElementById('btnNouveauCode').addEventListener('click',nouveauCode);
+btnShowCode.addEventListener('click',()=>showCode(!codeVisible));
+document.getElementById('btnNewCode').addEventListener('click',generateNewCode);
 
-/* ============ dialogues jeu ============ */
-const dlgPartie = document.getElementById('dlgPartie');
-const dlgEcran  = document.getElementById('dlgEcran');
-const dlgReglages = document.getElementById('dlgReglages');
+/* ============ game dialogs ============ */
+const newGameDialog = document.getElementById('dlgNewGame');
+const screenDialog  = document.getElementById('dlgScreen');
+const settingsDialog = document.getElementById('dlgSettings');
+const dlgLanguage = document.getElementById('dlgLanguage');
+const dlgInfo = document.getElementById('dlgInfo');
 
-document.getElementById('btnNouvelle').addEventListener('click',()=>dlgPartie.showModal());
-document.getElementById('partieNon').addEventListener('click',()=>dlgPartie.close());
-document.getElementById('partieOui').addEventListener('click',()=>{
-  dlgPartie.close();
-  dessinerGrille(tirerMots());
-  codeActuel = tirerCode();
-  afficherCode(false);
-  if(!veille && 'wakeLock' in navigator) dlgEcran.showModal();
+document.getElementById('btnNewGame').addEventListener('click',()=>newGameDialog.showModal());
+document.getElementById('btnNewGameCancel').addEventListener('click',()=>newGameDialog.close());
+document.getElementById('btnNewGameStart').addEventListener('click',()=>{
+  newGameDialog.close();
+  renderGrid(drawWords());
+  currentCode = drawCode();
+  showCode(false);
+  if(!wakeLock && 'wakeLock' in navigator) screenDialog.showModal();
 });
 
-document.getElementById('ecranNon').addEventListener('click',()=>dlgEcran.close());
-document.getElementById('ecranOui').addEventListener('click',async ()=>{
-  dlgEcran.close();
-  try{ veille = await navigator.wakeLock.request('screen'); }catch(e){ veille = null; }
+document.getElementById('btnScreenNo').addEventListener('click',()=>screenDialog.close());
+document.getElementById('btnScreenYes').addEventListener('click',async ()=>{
+  screenDialog.close();
+  try{ wakeLock = await navigator.wakeLock.request('screen'); }catch(e){ wakeLock = null; }
 });
 document.addEventListener('visibilitychange',async()=>{
-  if(veille && document.visibilityState==='visible'){
-    try{ veille = await navigator.wakeLock.request('screen'); }catch(e){ veille = null; }
+  if(wakeLock && document.visibilityState==='visible'){
+    try{ wakeLock = await navigator.wakeLock.request('screen'); }catch(e){ wakeLock = null; }
   }
 });
 
-/* ============ réglages ============ */
-document.getElementById('btnReglages').addEventListener('click',()=>dlgReglages.showModal());
-document.getElementById('btnFermerReglages').addEventListener('click',()=>dlgReglages.close());
-document.getElementById('langueFR').addEventListener('click',()=>appliquerLangue('fr', true));
-document.getElementById('langueEN').addEventListener('click',()=>appliquerLangue('en', true));
+/* ============ settings ============ */
+document.getElementById('btnSettings').addEventListener('click',()=>settingsDialog.showModal());
+document.getElementById('btnCloseSettings').addEventListener('click',()=>settingsDialog.close());
+document.getElementById('btnLanguage').addEventListener('click',()=>dlgLanguage.showModal());
+document.getElementById('btnInfo').addEventListener('click',()=>dlgInfo.showModal());
+document.getElementById('btnCloseInfo').addEventListener('click',()=>dlgInfo.close());
+document.getElementById('modeDark').addEventListener('click',()=>chooseMode('dark'));
+document.getElementById('modeLight').addEventListener('click',()=>chooseMode('light'));
 
-/* ============ plein écran ============ */
-const btnPleinEcran = document.getElementById('btnPleinEcran');
-function estPlein(){ return !!document.fullscreenElement; }
-function majBoutonPlein(){
-  const p = estPlein();
-  document.body.classList.toggle('plein', p);
-  btnPleinEcran.setAttribute('aria-pressed', p ? 'true' : 'false');
-  btnPleinEcran.setAttribute('aria-label', p ? I18N[etat.lang].fullscreenExit : I18N[etat.lang].fullscreenEnter);
+/* ============ fullscreen ============ */
+const btnFullscreen = document.getElementById('btnFullscreen');
+function isFullscreen(){ return !!document.fullscreenElement; }
+function updateFullscreenButton(){
+  const active = isFullscreen();
+  document.body.classList.toggle('fullscreen', active);
+  btnFullscreen.setAttribute('aria-pressed', active ? 'true' : 'false');
+  btnFullscreen.setAttribute('aria-label', active ? I18N[state.lang].fullscreenExit : I18N[state.lang].fullscreenEnter);
 }
-btnPleinEcran.addEventListener('click', async ()=>{
+btnFullscreen.addEventListener('click', async ()=>{
   try{
-    if(!estPlein()){ await document.documentElement.requestFullscreen(); }
+    if(!isFullscreen()){ await document.documentElement.requestFullscreen(); }
     else{ await document.exitFullscreen(); }
-  }catch(e){ /* API indisponible sur cet appareil */ }
+  }catch(e){ /* fullscreen API unavailable on this device */ }
 });
-document.addEventListener('fullscreenchange', majBoutonPlein);
+document.addEventListener('fullscreenchange', updateFullscreenButton);
 
-/* ============ démarrage ============ */
-construireThemes();
-appliquerTheme(etat.theme, false);
-appliquerLangue(etat.lang, false);
-dessinerGrille(tirerMots());
-codeActuel = tirerCode();
-afficherCode(false);
+/* ============ startup ============ */
+buildThemeList();
+buildLanguageList();
+applyPalette(false);
+applyLanguage(state.lang, false);
+renderGrid(drawWords());
+currentCode = drawCode();
+showCode(false);
 </script>
 </body>
 </html>
